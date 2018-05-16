@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% end %}</title>
+    <link rel="stylesheet" href="{{static_url('css/bootstrap.css')}}">
+    <link rel="stylesheet" href="{{static_url('css/reset.css')}}">
+    {% block style %} {% end %}
+    <script src="{{static_url('js/zepto.min.js')}}"></script>
+    <script src="{{static_url('js/base.js')}}"></script>
+    {% block script %} {% end %}
+</head>
+<body>
+<div class="main">
+    <!--导航条-->
+    <div class="container-fluid" style="height: 10%">
+        <div class="row">
+            <div class="col-xs-1 col-xs-offset-1"
+                 style="border-left: 1px solid #00aeff;border-bottom-left-radius: 100%;border-bottom: 1px solid #00aeff"></div>
+            <div class="col-xs-8" style="border-bottom: 1px solid #00aeff;">
+                <ul class="nav">
+                    <!--<li class="nav-active">手动驾驶</li>-->
+                    <li id="manual">手动驾驶</li>
+                    <li id="self-motion">自动驾驶</li>
+                    <li id="obstacle">红外避障</li>
+                    <li id="trailing">红外寻迹</li>
+                    <li id="voice">语音控制</li>
+                </ul>
+            </div>
+            <div class="col-xs-1 nav-right"
+                 style="border-right: 1px solid #00aeff;border-bottom-right-radius: 100%;border-bottom: 1px solid #00aeff"></div>
+        </div>
+    </div>
+    {% block body %} {% end %}
+    <img style="-webkit-user-select: none;display: block;z-index: -1" src="/video" class="portrait">
+    <!--<img style="-webkit-user-select: none;display: block;z-index: -1" src="http://192.168.1.190:4455/?action=stream" class="portrait">-->
+    <!--遮挡层照片（用户竖屏的时候提示横屏）-->
+    <img src="{{static_url('img/trance.png')}}" alt="" class="portrait img-responsiv clearfix" id="lesesss">
+</div>
+</body>
+</html>

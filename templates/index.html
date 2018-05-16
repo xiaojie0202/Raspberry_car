@@ -1,0 +1,195 @@
+{% extends base.html %}
+{% block style %}{%end%}
+
+{% block script %}
+<script>
+
+    var socket = new WebSocket("ws://" + window.location.host + "/api/getinfo");
+    var whileGetInfo = null; //socket定时器用于获取信息
+    function socketSendMsg() {
+        socket.send('1');
+    }
+
+    // ajax请求后端执行动作
+    function carMove(module, motion) {
+        $.ajax({
+            type: 'POST',
+            url: '/api/move',
+            dataType: "json",
+            data: {'module': module, 'motion': motion},
+            success: function (data) {
+                console.log(data)
+            }
+        });
+    }
+
+    // 用于给按钮绑定事件函数
+    function TouchStaartAndTouchEnd(btn, module, startmotion, endmotion) {
+        btn.on('touchstart', function (e) {
+            carMove(module, startmotion);
+            return false
+        }).on('touchend', function (e) {
+            carMove(module, endmotion);
+            return false
+        });
+    }
+
+    // 用于建立websocket
+    function GetInfoSockets() {
+        whileGetInfo = setInterval(socketSendMsg, 1000);
+
+        socket.onopen = function (ev) {
+            console.log('Websocket建立链接成功');
+        };
+        socket.onmessage = function (evt) {  // 收到服务器发送的消息后执行的回调
+            var data = JSON.parse(evt.data);
+            $('#car-wendu').text(data.temperature + "℃");
+            $('#cat-shidu').text(data.humidity + '%');
+            var ultwidth = data.ultrasonic + '%';
+            $('#ultrasonic_bar').css({'width': ultwidth});
+            $('#ultrasonic_text').text('超声波:' + ultwidth);
+            var hongwaiArray = [$('#hy-top-left'), $('#hy-top-right'), $('#hy-bottom-left'), $('#hy-bottom-right')];
+            $.each(data.hongwai, function (index, item) {
+                if (item == 1) {
+                    hongwaiArray[index].show();
+                } else {
+                    hongwaiArray[index].hide();
+                }
+            });
+        };
+    }
+
+    $(function () {
+        $('#manual').addClass('nav-active');
+
+        // 小车
+        TouchStaartAndTouchEnd($('#cat-move-up'), 1, 'up', 'stop');
+        TouchStaartAndTouchEnd($('#car-move-right'), 1, 'right', 'stop');
+        TouchStaartAndTouchEnd($('#car-move-left'), 1, 'left', 'stop');
+        TouchStaartAndTouchEnd($('#car-move-down'), 1, 'down', 'stop');
+        TouchStaartAndTouchEnd($('#car-speed-sub'), 1, 'sub', 'stop');
+        TouchStaartAndTouchEnd($('#car-speed-add'), 1, 'add', 'stop');
+
+        // 摄像头
+        TouchStaartAndTouchEnd($('#v-move-up'), 2, 'up', 'stop');
+        TouchStaartAndTouchEnd($('#v-move-right'), 2, 'right', 'stop');
+        TouchStaartAndTouchEnd($('#v-move-down'), 2, 'down', 'stop');
+        TouchStaartAndTouchEnd($('#v-move-left'), 2, 'left', 'stop');
+
+        // 超声波
+        TouchStaartAndTouchEnd($('#ultrasonic_left'), 3, 'left', 'stop');
+        TouchStaartAndTouchEnd($('#ultrasonic_middle'), 3, 'middle', 'stop');
+        TouchStaartAndTouchEnd($('#ultrasonic_right'), 3, 'right', 'stop');
+
+        //建立websocket
+        GetInfoSockets()
+    })
+</script>
+{% end %}
+
+{% block body %}
+<!--红外感应器-->
+<div class="container-fluid" style="height: 12%">
+    <div class="row">
+        <div class="col-xs-1" style="padding: 0">
+            <img src="{{static_url('img/hy-top-left.png')}}" alt="红外" style="left: 50%;top: 50%"
+                 class="cat-hy img-responsive" id="hy-top-left">
+        </div>
+        <div class="col-xs-1 col-xs-offset-1" style="padding: 0">
+            <img src="{{static_url('img/hy-top-right.png')}}" alt="红外" style="left: 0;top: 50%;"
+                 class="cat-hy img-responsive" id="hy-top-right">
+        </div>
+    </div>
+</div>
+<!--小车-温度计-湿度计-->
+<div class="container-fluid" style="height: 30%">
+    <div class="row">
+        <!--小车-->
+        <div class="col-xs-1 col-xs-offset-1" style="padding: 0">
+            <img src="{{static_url('img/hy-car.png')}}" alt="汽车" style="height: 100%;width: 100%"
+                 class="img-responsive">
+        </div>
+        <!--温度计-->
+        <div class="col-xs-1 col-xs-offset-8">
+            <img src="{{static_url('img/wendu.png')}}" alt="温度" style="height: 80%;margin-top: 50%"
+                 class="img-responsive">
+        </div>
+        <!--湿度-->
+        <div class="col-xs-1" style="padding: 0">
+            <img src="{{static_url('img/shidu.png')}}" alt="湿度" style="height: 70%;margin-top: 30%"
+                 class="img-responsive">
+        </div>
+    </div>
+</div>
+<!--红外感应器下-->
+<div class="container-fluid" style="height: 12%">
+    <div class="row">
+        <div class="col-xs-1" style="padding: 0">
+            <img src="{{static_url('img/hy-bottom-left.png')}}" alt="红外" style="left: 50%;top: 0"
+                 class="cat-hy img-responsive" id="hy-bottom-left">
+        </div>
+        <div class="col-xs-1 col-xs-offset-1" style="padding: 0">
+            <img src="{{static_url('img/hy-bottom-right.png')}}" alt="红外" style="left: 0;top: 0;"
+                 class="cat-hy img-responsive" id="hy-bottom-right">
+        </div>
+        <div class="col-xs-1 col-xs-offset-7"
+             style="padding: 0; text-align: center; font-weight: bold;color: red; font-size: 16px"><span
+                id="car-wendu">56℃</span></div>
+        <div class="col-xs-1" style="padding: 0; text-align: center; font-weight: bold;color: red; font-size: 16px">
+            <span id="cat-shidu">50%</span></div>
+    </div>
+</div>
+
+<div class="container-fluid" style="height: 36%;">
+    <!--向上移动按钮-->
+    <div class="row" style="height: 33.32%;">
+        <div class="col-xs-1 col-xs-offset-1 btn-up" id="cat-move-up"></div>
+        <!--超声波模块-->
+        <div class="col-xs-4 col-xs-offset-2" style="height: 50%">
+            <div class="progress">
+                <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45"
+                     aria-valuemin="0" aria-valuemax="100" style="width: 45%;" id="ultrasonic_bar">
+                    <span id="ultrasonic_text">超声波:45%</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-xs-1 col-xs-offset-2 btn-up" id="v-move-up"></div>
+    </div>
+    <!--左右-超声波-->
+    <div class="row" style="height: 33.32%;">
+        <div class="col-xs-1 btn-left" id="car-move-left"></div>
+        <div class="col-xs-1 btn-cat"></div>
+        <div class="col-xs-1  btn-right" id="car-move-right"></div>
+        <!--超声波控制按钮-->
+        <div class="col-xs-1 col-xs-offset-1" style="padding-left: 1%;padding-right: 1%">
+            <div style="border: 1px solid #5bc0de;border-radius: 100%;height: 80%;text-align: center;"
+                 id="ultrasonic_left">
+                <span style="font-weight: bold;font-size: 16px;color: #5bc0de; line-height: 200%">左</span>
+            </div>
+        </div>
+        <div class="col-xs-2" style="padding-left: 5%;padding-right: 1%; text-align: center">
+            <div style="border: 1px solid #5bc0de;border-radius: 100%;height: 80%;width: 50%;text-align: center"
+                 id="ultrasonic_middle">
+                <span style="font-weight: bold;font-size: 16px;color: #5bc0de; line-height: 200%">中</span>
+            </div>
+        </div>
+        <div class="col-xs-1" style="padding-left: 1%;padding-right: 1%;text-align: center">
+            <div style="border: 1px solid #5bc0de;border-radius: 100%;height: 80%" id="ultrasonic_right">
+                <span style="font-weight: bold;font-size: 16px;color: #5bc0de; line-height: 200%">右</span>
+            </div>
+        </div>
+        <!--摄像头-->
+        <div class="col-xs-1 col-xs-offset-1 btn-left" id="v-move-left"></div>
+        <div class="col-xs-1 btn-v"></div>
+        <div class="col-xs-1  btn-right" id="v-move-right"></div>
+    </div>
+    <!--向下-档位-->
+    <div class="row" style="height: 33.32%">
+        <div class="col-xs-1 col-xs-offset-1 btn-down" id="car-move-down"></div>
+        <div class="col-xs-1 col-xs-offset-2 btn-left" id="car-speed-sub"></div>
+        <div class="col-xs-2 btn-speed"><span style="color: red">55</span></div>
+        <div class="col-xs-1 btn-right" id="car-speed-add"></div>
+        <div class="col-xs-1 col-xs-offset-2 btn-down" id="v-move-down"></div>
+    </div>
+</div>
+{% end %}
