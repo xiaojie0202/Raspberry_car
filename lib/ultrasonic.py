@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 # 超声波模块
 import random
-import RPi.GPIO as GPIO
+# import RPi.GPIO as GPIO
 
 class Ulttrasonic(object):
 
