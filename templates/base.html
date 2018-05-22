@@ -36,6 +36,7 @@
     {% block body %} {% end %}
     <img style="-webkit-user-select: none;display: block;z-index: -1" src="/video" class="portrait">
     <!--<img style="-webkit-user-select: none;display: block;z-index: -1" src="http://192.168.1.190:4455/?action=stream" class="portrait">-->
+    <!--mjpg_streamer -i "/dream_car/mjpg-streamer-experimental/input_raspicam.so -fps 15 -x 1280 -y 720" -o "/dream_car/mjpg-streamer-experimental/output_http.so -w ./www -p 4455"-->
     <!--遮挡层照片（用户竖屏的时候提示横屏）-->
     <img src="{{static_url('img/trance.png')}}" alt="" class="portrait img-responsiv clearfix" id="lesesss">
 </div>

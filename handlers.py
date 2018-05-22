@@ -1,10 +1,10 @@
 # -*- coding:utf-8 -*-
 from tornado.web import RequestHandler
 from tornado.websocket import WebSocketHandler
-from lib import car_move
+from lib.car_move import car_move
 from lib import ultrasonic
-from lib import camera_move
-from lib import dth22
+from lib.camera_move import camera_move
+from lib.dth22 import dth22
 from lib import infrared
 import json
 import time
@@ -20,7 +20,8 @@ class IndexHandler(RequestHandler):
 class MoveHandler(RequestHandler):
 
     def __init__(self, *args, **kwargs):
-        self.car_move = car_move.Move(1)  # 实例化控制小车移动的类
+        print('访问过来了')
+        self.car_move = car = car_move.Move(100)  # 实例化控制小车移动的类
         # 小车的控制方法
         self.car_move_dict = {'up': self.car_move.move_up,
                               'left': self.car_move.move_left,
@@ -30,7 +31,7 @@ class MoveHandler(RequestHandler):
                               'add': self.car_move.add_speed,
                               'sub': self.car_move.sub_speed}
 
-        self.camera_move = camera_move.CameraMove()
+        self.camera_move = camera_move
         # 摄像头移动对应的方法
         self.camera_move_dict = {
             'up': self.camera_move.rate_up,
@@ -69,7 +70,7 @@ class GetInfo(WebSocketHandler):
     def __init__(self, application, request, **kwargs):
         super(GetInfo, self).__init__(application, request, **kwargs)
         self.ultrasonic = ultrasonic.Ulttrasonic()  # 实例化超声波模块
-        self.dth22 = dth22.Humiture()
+        self.dth22 = dth22
         self.infrared = infrared.Infrared()
 
     def open(self, *args, **kwargs):
@@ -90,7 +91,7 @@ class GetInfo(WebSocketHandler):
 class VideoHandler(RequestHandler):
 
     def get(self, *args, **kwargs):
-        self.redirect('http://192.168.1.190:4455/?action=stream')
+        self.redirect('http://192.168.2.109:4455/?action=stream')
 
 
 

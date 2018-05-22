@@ -19,3 +19,5 @@ class CameraMove(object):
 
     def rate_stop(self):
         print('摄像头停止旋转')
+
+camera_move = CameraMove()
